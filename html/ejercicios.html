@@ -5,7 +5,9 @@ last modified on: 13/03/2026 | 03-13-2026
 
 PROJECT: WEB FOR PRACTICE OF DATABASES
 
-FUNCTION: Pagina para gestionar los ejercicios prácticos
+FUNCTION: 
+Provides the exercise editor interface, allowing users to add, view, and delete SQL exercises stored in localStorage, including optional images.
+It connects to ejercicios.js, which handles saving, rendering the list, and managing the exercise data
 *****************************************************************************************************************
 -->
 
@@ -36,6 +38,10 @@ FUNCTION: Pagina para gestionar los ejercicios prácticos
 
         <label>Respuesta correcta (SQL):</label>
         <textarea id="inputRespuesta" rows="3" placeholder="Escribe la respuesta correcta..."></textarea>
+
+        <label>Imagen / captura (opcional):</label>
+        <input type="file" id="inputImagen" accept="image/*">
+        <div id="previewImagen"></div>
 
         <div class="form-buttons">
             <button onclick="guardarEjercicio()">Guardar</button>

@@ -1,3 +1,14 @@
+/*
+*****************************************************************************************************************
+CREATOR: Javier Alegría Sobrados
+last modified on: 13/03/2026 | 03-13-2026
+
+PROJECT: WEB FOR PRACTICE OF DATABASES
+
+FUNCTION: Style page for "ejercicios.html"
+*****************************************************************************************************************
+*/
+
 /* ── Google Fonts ─────────────────────────────────────────────────────────── */
 @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
  
@@ -340,3 +351,66 @@ footer a {
     transition: opacity 0.2s;
 }
 footer a:hover { opacity: 0.75; }
+/* ── Área de subida de imagen ─────────────────────────────────────────────── */
+.file-upload-area {
+    width: 100%;
+    border: 1px dashed #2a5a8a;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    cursor: pointer;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+    background: #060e1b;
+    letter-spacing: 0.03em;
+}
+
+.file-upload-area:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+}
+
+/* Previsualización en el formulario */
+#previsualizacion {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-top: 0.75rem;
+    background: #060e1b;
+}
+
+/* Botón quitar imagen */
+.btn-quitar-imagen {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding: 0.35rem 0.85rem;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid var(--error);
+    background: transparent;
+    color: var(--error);
+    margin-top: 0.5rem;
+    transition: all 0.18s ease;
+}
+
+.btn-quitar-imagen:hover {
+    background: rgba(255, 87, 87, 0.1);
+}
+
+/* ── Imagen en la lista de ejercicios ─────────────────────────────────────── */
+.ejercicio-imagen {
+    display: block;          
+    width: 100%;
+    max-height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: #060e1b;
+    margin-top: 0.75rem;
+    margin-bottom: 0.75rem; 
+}
