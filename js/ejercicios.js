@@ -210,10 +210,6 @@ function resetearContadores(indice) {
     renderizarLista();
 }
 
-// ── Iniciar ───────────────────────────────────────────────────────────────────
-crearLightbox();
-inicializar();
-
 // ── Lightbox ──────────────────────────────────────────────────────────────────
 function crearLightbox() {
     if (document.getElementById("lightboxOverlay")) return;
@@ -277,3 +273,7 @@ function cerrarLightbox() {
     if (overlay) overlay.style.display = "none";
     document.body.style.overflow = "";
 }
+
+// ── Iniciar ───────────────────────────────────────────────────────────────────
+crearLightbox();
+inicializar();
