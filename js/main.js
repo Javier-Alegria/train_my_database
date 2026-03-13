@@ -216,6 +216,149 @@ function normalizarSQL(consulta) {
     return firma.replace(/\s+/g, " ").trim();
 }
 
+
+// ── Comparación por resultado real (si AlaSQL está disponible) ───────────────
+function tokenizarIdentificadores(sql) {
+    return (sql.toLowerCase().match(/[a-z_][a-z0-9_]*/g) || []);
+}
+
+function extraerTablasYAlias(sql) {
+    const regex = /(from|join)\s+([a-z_][a-z0-9_]*)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?/gi;
+    const tablas = [];
+    let m;
+
+    while ((m = regex.exec(sql)) !== null) {
+        const tabla = m[2].toLowerCase();
+        const alias = (m[3] || tabla).toLowerCase();
+        tablas.push({ tabla, alias });
+    }
+
+    return tablas;
+}
+
+function extraerColumnasReferenciadas(sql, aliases) {
+    const columnasPorTabla = {};
+    aliases.forEach(({ tabla }) => { columnasPorTabla[tabla] = new Set(["id"]); });
+
+    const aliasATabla = {};
+    aliases.forEach(({ tabla, alias }) => { aliasATabla[alias] = tabla; });
+
+    const cualificadas = [...sql.toLowerCase().matchAll(/([a-z_][a-z0-9_]*)\.([a-z_][a-z0-9_]*)/g)];
+    for (const c of cualificadas) {
+        const alias = c[1];
+        const columna = c[2];
+        if (aliasATabla[alias]) columnasPorTabla[aliasATabla[alias]].add(columna);
+    }
+
+    const keywords = new Set([
+        "select", "from", "join", "on", "where", "and", "or", "as", "between", "like", "in", "is", "null",
+        "order", "by", "group", "having", "limit", "distinct", "asc", "desc", "inner", "left", "right", "full"
+    ]);
+    const tokens = tokenizarIdentificadores(sql);
+    const firstTable = aliases[0] ? aliases[0].tabla : null;
+
+    for (let i = 0; i < tokens.length; i++) {
+        const tk = tokens[i];
+        const prev = tokens[i - 1] || "";
+        const next = tokens[i + 1] || "";
+
+        if (keywords.has(tk)) continue;
+        if (aliasATabla[tk]) continue;
+        if (aliases.some(({ tabla }) => tabla === tk)) continue;
+        if (prev === "from" || prev === "join" || prev === "as") continue;
+        if (next === "from" || next === "join") continue;
+        if (!firstTable) continue;
+
+        columnasPorTabla[firstTable].add(tk);
+    }
+
+    return columnasPorTabla;
+}
+
+function crearDatasetAleatorio(aliases, columnasPorTabla) {
+    const filas = {};
+    aliases.forEach(({ tabla }) => { filas[tabla] = []; });
+
+    for (let i = 1; i <= 12; i++) {
+        aliases.forEach(({ tabla }) => {
+            const row = {};
+            columnasPorTabla[tabla].forEach((col) => {
+                if (col.includes("nom") || col.includes("name")) {
+                    row[col] = `txt_${(i % 5) + 1}`;
+                } else {
+                    row[col] = (i * 13 + col.length * 7) % 100000;
+                }
+            });
+            row.id = i;
+            filas[tabla].push(row);
+        });
+    }
+
+    return filas;
+}
+
+function normalizarResultado(resultado) {
+    const filas = resultado.map((fila) => {
+        const ordenadas = {};
+        Object.keys(fila).sort().forEach((k) => { ordenadas[k] = fila[k]; });
+        return JSON.stringify(ordenadas);
+    });
+
+    return filas.sort().join("\n");
+}
+
+function compararPorResultado(respuestaUsuario, respuestaCorrecta) {
+    if (typeof window.alasql === "undefined") {
+        return { disponible: false, equivalente: false, errorUsuario: false };
+    }
+
+    const qUser = respuestaUsuario.trim().replace(/;+\s*$/g, "");
+    const qOk   = respuestaCorrecta.trim().replace(/;+\s*$/g, "");
+
+    const aliases = extraerTablasYAlias(`${qUser} ${qOk}`);
+    if (aliases.length === 0) {
+        return { disponible: false, equivalente: false, errorUsuario: false };
+    }
+
+    const columnasPorTabla = extraerColumnasReferenciadas(`${qUser} ${qOk}`, aliases);
+
+    for (let intento = 0; intento < 4; intento++) {
+        const db = new window.alasql.Database();
+        const datos = crearDatasetAleatorio(aliases, columnasPorTabla);
+
+        const tablasUnicas = [...new Set(aliases.map((x) => x.tabla))];
+
+        for (const tabla of tablasUnicas) {
+            const columnas = [...columnasPorTabla[tabla]];
+            const definicion = columnas.map((col) => `[${col}] STRING`).join(", ");
+            db.exec(`CREATE TABLE [${tabla}] (${definicion})`);
+            for (const fila of datos[tabla]) {
+                db.tables[tabla].data.push(fila);
+            }
+        }
+
+        let rUser;
+        let rOk;
+        try {
+            rUser = db.exec(qUser);
+        } catch (e) {
+            return { disponible: true, equivalente: false, errorUsuario: true };
+        }
+
+        try {
+            rOk = db.exec(qOk);
+        } catch (e) {
+            return { disponible: false, equivalente: false, errorUsuario: false };
+        }
+
+        if (normalizarResultado(rUser) !== normalizarResultado(rOk)) {
+            return { disponible: true, equivalente: false, errorUsuario: false };
+        }
+    }
+
+    return { disponible: true, equivalente: true, errorUsuario: false };
+}
+
 // ── Enviar respuesta ──────────────────────────────────────────────────────────
 function enviarRespuesta() {
     const parrafoResultado = document.getElementById("resultado");
@@ -230,8 +373,11 @@ function enviarRespuesta() {
         return;
     }
 
-    const esCorrecta =
-        normalizarSQL(respuestaUsuario) === normalizarSQL(ejercicioActual.respuesta);
+    const comparacionResultado = compararPorResultado(respuestaUsuario, ejercicioActual.respuesta);
+
+    const esCorrecta = comparacionResultado.disponible
+        ? comparacionResultado.equivalente
+        : normalizarSQL(respuestaUsuario) === normalizarSQL(ejercicioActual.respuesta);
 
     const lista = obtenerEjercicios();
     if (indiceEjercicioActual !== null && lista[indiceEjercicioActual]) {
@@ -248,6 +394,9 @@ function enviarRespuesta() {
     if (esCorrecta) {
         parrafoResultado.textContent = "✅ ¡Correcto! Muy bien.";
         btnReintentar.style.display  = "none";
+    } else if (comparacionResultado.errorUsuario) {
+        parrafoResultado.textContent = "❌ Tu consulta tiene error de sintaxis SQL.";
+        btnReintentar.style.display  = "inline";
     } else {
         parrafoResultado.textContent = "❌ Incorrecto. Inténtalo de nuevo.";
         btnReintentar.style.display  = "inline";
