@@ -223,7 +223,7 @@ function tokenizarIdentificadores(sql) {
 }
 
 function extraerTablasYAlias(sql) {
-    const regex = /(from|join)\s+([a-z_][a-z0-9_]*)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?/gi;
+    const regex = /\b(from|join)\s+([a-z_][a-z0-9_]*)(?:\s+(?:as\s+)?([a-z_][a-z0-9_]*))?/gi;
     const tablas = [];
     let m;
 
@@ -243,7 +243,7 @@ function extraerColumnasReferenciadas(sql, aliases) {
     const aliasATabla = {};
     aliases.forEach(({ tabla, alias }) => { aliasATabla[alias] = tabla; });
 
-    const cualificadas = [...sql.toLowerCase().matchAll(/([a-z_][a-z0-9_]*)\.([a-z_][a-z0-9_]*)/g)];
+    const cualificadas = [...sql.toLowerCase().matchAll(/\b([a-z_][a-z0-9_]*)\.([a-z_][a-z0-9_]*)\b/g)];
     for (const c of cualificadas) {
         const alias = c[1];
         const columna = c[2];
@@ -325,12 +325,11 @@ function compararPorResultado(respuestaUsuario, respuestaCorrecta) {
     for (let intento = 0; intento < 4; intento++) {
         const db = new window.alasql.Database();
         const datos = crearDatasetAleatorio(aliases, columnasPorTabla);
-
         const tablasUnicas = [...new Set(aliases.map((x) => x.tabla))];
 
         for (const tabla of tablasUnicas) {
             const columnas = [...columnasPorTabla[tabla]];
-            const definicion = columnas.map((col) => `[${col}] STRING`).join(", ");
+            const definicion = columnas.map((col) => `[${col}] NUMBER`).join(", ");
             db.exec(`CREATE TABLE [${tabla}] (${definicion})`);
             for (const fila of datos[tabla]) {
                 db.tables[tabla].data.push(fila);
