@@ -127,13 +127,93 @@ function elegirDeLista() {
     mostrarEjercicio(lista[i], i);
 }
 
-// ── Normalizar texto para comparar ───────────────────────────────────────────
-function normalizar(texto) {
-    return texto
-        .toLowerCase()
-        .replace(/[\r\n\t]+/g, " ")
+// ── Normalizar SQL para comparar por estructura (no por formato literal) ────
+function normalizarAlias(alias) {
+    return alias
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/gi, "")
+        .toLowerCase();
+}
+
+function normalizarCondicionWhere(where) {
+    let texto = where
+        .replace(/\b([a-z_][a-z0-9_]*)\s+between\s+(\d+)\s+and\s+(\d+)\b/gi, "$1 >= $2 and $1 <= $3")
+        .replace(/\b([a-z_][a-z0-9_]*)\s*>\s*(\d+)\s+and\s*\1\s*<\s*(\d+)\b/gi, (_, campo, min, max) => {
+            const limiteInferior = Number(min) + 1;
+            const limiteSuperior = Number(max) - 1;
+            return `${campo} >= ${limiteInferior} and ${campo} <= ${limiteSuperior}`;
+        })
+        .replace(/\s*(<=|>=|<>|!=|=|<|>)\s*/g, " $1 ")
         .replace(/\s+/g, " ")
         .trim();
+
+    if (texto.includes(" and ")) {
+        texto = texto
+            .split(/\s+and\s+/)
+            .map((parte) => parte.trim())
+            .filter(Boolean)
+            .sort()
+            .join(" and ");
+    }
+
+    return texto;
+}
+
+
+function normalizarSelect(selectParte) {
+    return selectParte
+        .split(",")
+        .map((campo) => campo
+            .replace(/\s+as\s+.+$/gi, "")
+            .replace(/\s+/g, " ")
+            .trim())
+        .join(",");
+}
+function normalizarSQL(consulta) {
+    let normalizada = consulta
+        .toLowerCase()
+        // Eliminar comentarios de línea y de bloque
+        .replace(/--.*$/gm, "")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        // Unificar aliases escritos con comillas o espacios
+        .replace(/\bas\s+(["'`])([^"'`]+)\1/gi, (_, __, alias) => ` as ${normalizarAlias(alias)}`)
+        // Eliminar alias de tablas: FROM tabla t / JOIN tabla t
+        .replace(/\b(from|join)\s+([a-z_][a-z0-9_]*)(?:\s+as)?\s+[a-z_][a-z0-9_]*/gi, "$1 $2")
+        // Quitar prefijos de alias de tabla en columnas (e.campo -> campo)
+        .replace(/\b[a-z_][a-z0-9_]*\./g, "")
+        // Espacios unificados
+        .replace(/[\r\n\t]+/g, " ")
+        .replace(/\s+/g, " ")
+        // Ignorar ; finales opcionales
+        .replace(/;+\s*$/g, "")
+        .trim();
+
+    const partes = normalizada.match(/^(select\s+.+?)\s+from\s+(.+?)(?:\s+where\s+(.+))?$/i);
+    if (!partes) return normalizada;
+
+    const selectParte = normalizarSelect(partes[1].replace(/^select\s+/i, "").replace(/\s*,\s*/g, ","));
+    const fromParte   = partes[2];
+    const whereParte  = partes[3] || "";
+
+    const tablas = fromParte
+        .split(/\bjoin\b/i)
+        .map((p) => p.replace(/\bon\b[\s\S]*$/i, "").trim())
+        .filter(Boolean)
+        .sort();
+
+    const onPartes = [...fromParte.matchAll(/\bon\b\s+(.+?)(?=\bjoin\b|$)/gi)]
+        .map((m) => m[1].replace(/\s*(<=|>=|<>|!=|=|<|>)\s*/g, "$1").replace(/\s+/g, " ").trim())
+        .filter(Boolean)
+        .sort();
+
+    const whereNormalizado = whereParte ? normalizarCondicionWhere(whereParte) : "";
+
+    let firma = `select ${selectParte} from ${tablas.join(" join ")}`;
+    if (onPartes.length) firma += ` on ${onPartes.join(" and ")}`;
+    if (whereNormalizado) firma += ` where ${whereNormalizado}`;
+
+    return firma.replace(/\s+/g, " ").trim();
 }
 
 // ── Enviar respuesta ──────────────────────────────────────────────────────────
@@ -151,7 +231,7 @@ function enviarRespuesta() {
     }
 
     const esCorrecta =
-        normalizar(respuestaUsuario) === normalizar(ejercicioActual.respuesta);
+        normalizarSQL(respuestaUsuario) === normalizarSQL(ejercicioActual.respuesta);
 
     const lista = obtenerEjercicios();
     if (indiceEjercicioActual !== null && lista[indiceEjercicioActual]) {
