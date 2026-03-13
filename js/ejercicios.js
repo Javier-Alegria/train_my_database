@@ -23,7 +23,6 @@ const ejerciciosPorDefecto = [
     {
         titulo:    "SELECT básico",
         enunciado: "Selecciona todos los registros de la tabla 'usuarios'.",
-        respuesta: "SELECT * FROM usuarios",
         imagen:    null,
         aciertos:  0,
         fallos:    0
@@ -31,7 +30,6 @@ const ejerciciosPorDefecto = [
     {
         titulo:    "SELECT con columnas específicas",
         enunciado: "Selecciona solo el nombre y el email de la tabla 'usuarios'.",
-        respuesta: "SELECT nombre, email FROM usuarios",
         imagen:    null,
         aciertos:  0,
         fallos:    0
@@ -39,7 +37,6 @@ const ejerciciosPorDefecto = [
     {
         titulo:    "SELECT con WHERE",
         enunciado: "Selecciona todos los usuarios cuyo campo 'activo' sea igual a 1.",
-        respuesta: "SELECT * FROM usuarios WHERE activo = 1",
         imagen:    null,
         aciertos:  0,
         fallos:    0
@@ -101,7 +98,6 @@ function renderizarLista() {
             </strong>
             ${imagenHtml}
             <p><em>Enunciado:</em> ${ejercicio.enunciado}</p>
-            <p><em>Respuesta correcta:</em> <code>${ejercicio.respuesta}</code></p>
             <div class="ejercicio-buttons">
                 <button onclick="eliminarEjercicio(${indice})">Eliminar</button>
                 <button onclick="resetearContadores(${indice})">Resetear contadores</button>
@@ -119,7 +115,6 @@ function mostrarFormulario() {
     document.getElementById("mensajeFormulario").textContent = "";
     document.getElementById("inputTitulo").value             = "";
     document.getElementById("inputEnunciado").value          = "";
-    document.getElementById("inputRespuesta").value          = "";
     quitarImagen();
 }
 
@@ -167,16 +162,15 @@ function quitarImagen() {
 function guardarEjercicio() {
     const titulo    = document.getElementById("inputTitulo").value.trim();
     const enunciado = document.getElementById("inputEnunciado").value.trim();
-    const respuesta = document.getElementById("inputRespuesta").value.trim();
     const mensaje   = document.getElementById("mensajeFormulario");
 
-    if (titulo === "" || enunciado === "" || respuesta === "") {
-        mensaje.textContent = "Por favor, rellena el título, el enunciado y la respuesta.";
+    if (titulo === "" || enunciado === "") {
+        mensaje.textContent = "Por favor, rellena el título y el enunciado.";
         return;
     }
 
     const lista = obtenerEjercicios();
-    lista.push({ titulo, enunciado, respuesta, imagen: imagenPendiente, aciertos: 0, fallos: 0 });
+    lista.push({ titulo, enunciado, imagen: imagenPendiente, aciertos: 0, fallos: 0 });
 
     try {
         guardarEnStorage(lista);
