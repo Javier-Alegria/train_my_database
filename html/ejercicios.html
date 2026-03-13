@@ -1,0 +1,59 @@
+<!--
+*****************************************************************************************************************
+CREATOR: Javier Alegría Sobrados
+last modified on: 13/03/2026 | 03-13-2026
+
+PROJECT: WEB FOR PRACTICE OF DATABASES
+
+FUNCTION: Pagina para gestionar los ejercicios prácticos
+*****************************************************************************************************************
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train my database | Editor de ejercicios</title>
+    <link rel="stylesheet" href="../style/style-ejercicios.css">
+</head>
+<body>
+
+    <h1>Lista de ejercicios</h1>
+    <h3>Atención: el botón de eliminar no confirma la acción, si pulsa, se eliminará directamente</h3>
+
+    <button onclick="mostrarFormulario()">+ Añadir ejercicio</button>
+
+    <!-- Formulario oculto para añadir un ejercicio nuevo -->
+    <div id="formulario" style="display:none">
+        <h3>Nuevo ejercicio</h3>
+
+        <label>Título:</label>
+        <input type="text" id="inputTitulo" placeholder="Ej: SELECT básico, WHERE con condición...">
+
+        <label>Enunciado:</label>
+        <textarea id="inputEnunciado" rows="3" placeholder="Escribe el enunciado del ejercicio..."></textarea>
+
+        <label>Respuesta correcta (SQL):</label>
+        <textarea id="inputRespuesta" rows="3" placeholder="Escribe la respuesta correcta..."></textarea>
+
+        <div class="form-buttons">
+            <button onclick="guardarEjercicio()">Guardar</button>
+            <button onclick="cancelarFormulario()">Cancelar</button>
+        </div>
+        <p id="mensajeFormulario"></p>
+    </div>
+
+    <hr>
+
+    <!-- Lista de ejercicios guardados -->
+    <div id="listaEjercicios"></div>
+
+    <footer>
+        <p>2026 Web de ejercicios prácticos de Base de Datos. Javier Alegría Sobrados</p>
+        <p><a href="mysql-ej.html">← Volver a ejercicios prácticos</a></p>
+    </footer>
+
+    <script src="../js/ejercicios.js"></script>
+</body>
+</html>

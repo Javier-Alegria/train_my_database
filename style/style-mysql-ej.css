@@ -1,0 +1,306 @@
+/* ── Google Fonts ─────────────────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap');
+ 
+/* ── Variables ────────────────────────────────────────────────────────────── */
+:root {
+    --bg:           #07101f;
+    --bg-surface:   #0d1a2d;
+    --bg-card:      #112035;
+    --border:       #1e3a5a;
+    --border-glow:  #2a5a8a;
+    --text:         #c8daf0;
+    --text-muted:   #4a6a8a;
+    --accent:       #38bdf8;
+    --accent-dim:   rgba(56, 189, 248, 0.12);
+    --success:      #22d472;
+    --success-dim:  rgba(34, 212, 114, 0.12);
+    --error:        #ff5757;
+    --error-dim:    rgba(255, 87, 87, 0.12);
+    --font-display: 'Syne', sans-serif;
+    --font-mono:    'JetBrains Mono', monospace;
+}
+ 
+/* ── Reset ────────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+/* ── Body ─────────────────────────────────────────────────────────────────── */
+body {
+    background-color: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 50% at 50% -5%, rgba(56,189,248,0.07) 0%, transparent 65%);
+    color: var(--text);
+    font-family: var(--font-mono);
+    min-height: 100vh;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeUp 0.5s ease both;
+}
+ 
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+ 
+/* ── H1 ───────────────────────────────────────────────────────────────────── */
+h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #e2f0ff 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.25rem;
+    width: 100%;
+    max-width: 780px;
+}
+ 
+/* ── Nav ──────────────────────────────────────────────────────────────────── */
+nav {
+    width: 100%;
+    max-width: 780px;
+    margin-bottom: 1rem;
+}
+ 
+nav ul {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+ 
+nav ul li a {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    transition: all 0.2s ease;
+    background: var(--bg-surface);
+}
+ 
+nav ul li a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-dim);
+    box-shadow: 0 0 10px rgba(56,189,248,0.12);
+}
+ 
+/* ── Gestionar link ───────────────────────────────────────────────────────── */
+a#gestionar,
+body > a {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+    width: 100%;
+    max-width: 780px;
+}
+ 
+body > a:hover { color: var(--accent); }
+ 
+/* ── Ejercicio card ───────────────────────────────────────────────────────── */
+#ejercicio {
+    width: 100%;
+    max-width: 780px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+ 
+/* ── Enunciado ────────────────────────────────────────────────────────────── */
+#enunciado {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.7;
+    color: var(--text);
+    padding: 1rem 1.25rem;
+    background: var(--bg-surface);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    min-height: 3rem;
+}
+ 
+/* ── Textarea respuesta ───────────────────────────────────────────────────── */
+#respuesta {
+    width: 100%;
+    background: #060e1b;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: #7dd3fc;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    padding: 1rem;
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+}
+ 
+#respuesta::placeholder { color: var(--text-muted); }
+ 
+#respuesta:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.1), 0 0 20px rgba(56,189,248,0.06);
+}
+ 
+/* ── Botones fila ─────────────────────────────────────────────────────────── */
+.btn-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+ 
+/* ── Botones base ─────────────────────────────────────────────────────────── */
+button {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    padding: 0.55rem 1.3rem;
+    border-radius: 7px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.18s ease;
+    outline: none;
+}
+ 
+/* Primario — Enviar */
+button[onclick="enviarRespuesta()"] {
+    background: var(--accent);
+    color: #07101f;
+    border-color: var(--accent);
+}
+button[onclick="enviarRespuesta()"]:hover {
+    background: #7dd3fc;
+    box-shadow: 0 0 18px rgba(56,189,248,0.35);
+    transform: translateY(-1px);
+}
+ 
+/* Secundario — Borrar, Reintentar */
+button[onclick="borrarRespuesta()"],
+#btnReintentar {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border);
+}
+button[onclick="borrarRespuesta()"]:hover,
+#btnReintentar:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+    background: rgba(255,255,255,0.04);
+}
+ 
+/* ── Resultado ────────────────────────────────────────────────────────────── */
+#resultado {
+    font-size: 0.9rem;
+    font-weight: 500;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    min-height: 1rem;
+    transition: all 0.3s ease;
+}
+ 
+#resultado:empty { padding: 0; }
+ 
+#resultado:not(:empty) {
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+}
+ 
+/* ── Controles inferiores ─────────────────────────────────────────────────── */
+#controles {
+    width: 100%;
+    max-width: 780px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+}
+ 
+/* Nuevo ejercicio al azar */
+#controles button:first-child {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
+    padding: 0.5rem 1.1rem;
+}
+#controles button:first-child:hover {
+    background: var(--accent-dim);
+    box-shadow: 0 0 12px rgba(56,189,248,0.18);
+    transform: translateY(-1px);
+}
+ 
+/* Label */
+#controles label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}
+ 
+/* Select */
+#selectorEjercicios {
+    flex: 1;
+    min-width: 180px;
+    background: #060e1b;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 0.5rem 0.85rem;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+ 
+#selectorEjercicios:focus { border-color: var(--accent); }
+ 
+/* Ir a este ejercicio */
+#controles button:last-child {
+    background: transparent;
+    color: var(--text-muted);
+    border-color: var(--border);
+    padding: 0.5rem 1rem;
+}
+#controles button:last-child:hover {
+    color: var(--text);
+    border-color: var(--text-muted);
+    background: rgba(255,255,255,0.04);
+}
+ 
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+footer {
+    width: 100%;
+    max-width: 780px;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+    margin-top: auto;
+}
+ 
+footer p {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+}

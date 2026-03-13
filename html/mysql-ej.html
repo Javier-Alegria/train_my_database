@@ -1,0 +1,64 @@
+<!--
+*****************************************************************************************************************
+CREATOR: Javier Alegría Sobrados
+last modified on: 13/03/2026 | 03-13-2026
+
+PROJECT: WEB FOR PRACTICE OF DATABASES
+
+FUNCTION: Página con ejercicios prácticos sobre MySQL
+*****************************************************************************************************************
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Train my database | Ejercicios practicos</title>
+    <link rel="stylesheet" href="../style/style-mysql-ej.css">
+</head>
+<body>
+
+    <h1>Ejercicios prácticos de MySQL</h1>
+    <nav>
+        <ul>
+            <li><a href="bbdd-teoria.html">Teoría de BBDD</a></li>
+            <li><a href="../index.html">Inicio</a></li>
+        </ul>
+    </nav>
+
+    <a href="ejercicios.html">⚙️ Gestionar ejercicios</a>
+
+    <div id="ejercicio">
+        <p id="enunciado"></p>
+
+        <textarea id="respuesta" rows="5" cols="60" placeholder="Escribe tu respuesta aquí..."></textarea>
+
+        <br>
+        <button onclick="enviarRespuesta()">Enviar</button>
+        <button onclick="borrarRespuesta()">Borrar</button>
+
+        <p id="resultado"></p>
+
+        <button id="btnReintentar" onclick="reintentar()" style="display:none">Reintentar</button>
+    </div>
+
+    <hr>
+
+    <div id="controles">
+        <button onclick="nuevoEjercicio()">Nuevo ejercicio al azar</button>
+
+        <label for="selectorEjercicios">o elige uno:</label>
+        <select id="selectorEjercicios">
+            <option value="">-- Selecciona un ejercicio --</option>
+        </select>
+        <button onclick="elegirDeLista()">Ir a este ejercicio</button>
+    </div>
+
+    <footer>
+        <p>2026 Web de ejercicios prácticos de Base de Datos. Javier Alegría Sobrados</p>
+    </footer>
+
+    <script src="../js/main.js"></script>
+</body>
+</html>
